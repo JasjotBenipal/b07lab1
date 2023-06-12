@@ -93,34 +93,34 @@ public class Polynomial{
 	*/
 	// Add method
 	public Polynomial add(Polynomial polynomial) {
-    	double[] poly1Coefficients = this.coefficients;
-    	int[] poly1Exponents = this.exponents;
+    	double[] currCoef = this.coefficients;
+    	int[] currExpo = this.exponents;
 
-    	double[] poly2Coefficients = polynomial.coefficients;
-    	int[] poly2Exponents = polynomial.exponents;
+    	double[] inputCoef = polynomial.coefficients;
+    	int[] inputExpo = polynomial.exponents;
 
-    	int poly1Length = poly1Coefficients.length;
-    	int poly2Length = poly2Coefficients.length;
-    	int resultLength = Math.max(poly1Length, poly2Length);
+    	int currPolyLen = currCoef.length;
+    	int inputPolyLen = inputCoef.length;
+    	int addLen = Math.max(currPolyLen, inputPolyLen);
 
-   		double[] resultCoefficients = new double[resultLength];
-    	int[] resultExponents = new int[resultLength];
+   	double[] resultCoefficients = new double[addLen];
+    	int[] resultExponents = new int[addLen];
 
     	int i = 0, j = 0, k = 0;
-    	while (i < poly1Length && j < poly2Length) {
-        	if (poly1Exponents[i] < poly2Exponents[j]) {
-            	resultCoefficients[k] = poly1Coefficients[i];
-            	resultExponents[k] = poly1Exponents[i];
+    	while (i < currPolyLen && j < inputPolyLen) {
+        	if (currExpo[i] < inputExpo[j]) {
+            	resultCoefficients[k] = currCoef[i];
+            	resultExponents[k] = currExpo[i];
             	i++;
-        	} else if (poly1Exponents[i] > poly2Exponents[j]) {
-            	resultCoefficients[k] = poly2Coefficients[j];
-            	resultExponents[k] = poly2Exponents[j];
+        	} else if (currExpo[i] > inputExpo[j]) {
+            	resultCoefficients[k] = inputCoef[j];
+            	resultExponents[k] = inputExpo[j];
             	j++;
 			} else {
-				double sum = poly1Coefficients[i] + poly2Coefficients[j];
+				double sum = currCoef[i] + inputCoef[j];
 				if (sum != 0) {
 					resultCoefficients[k] = sum;
-					resultExponents[k] = poly1Exponents[i];
+					resultExponents[k] = currExpo[i];
 				} else {
 					// Skip the term if the sum is zero
 					k--;
@@ -131,17 +131,16 @@ public class Polynomial{
 			k++;
 		}
 
-		// Copy remaining terms from the longer polynomial
-		while (i < poly1Length) {
-			resultCoefficients[k] = poly1Coefficients[i];
-			resultExponents[k] = poly1Exponents[i];
+		while (i < currPolyLen) {
+			resultCoefficients[k] = currCoef[i];
+			resultExponents[k] = currExpo[i];
 			i++;
 			k++;
 		}
 
-		while (j < poly2Length) {
-			resultCoefficients[k] = poly2Coefficients[j];
-			resultExponents[k] = poly2Exponents[j];
+		while (j < inputPolyLen) {
+			resultCoefficients[k] = inputCoef[j];
+			resultExponents[k] = inputExpo[j];
 			j++;
 			k++;
 		}
@@ -149,46 +148,46 @@ public class Polynomial{
 		return new Polynomial(resultCoefficients, resultExponents);
 	}
 
-// Multiplication
-public Polynomial multiply(Polynomial polynomial) {
-    double[] poly1Coefficients = this.coefficients;
-    int[] poly1Exponents = this.exponents;
+	// Multiplication
+	public Polynomial multiply(Polynomial polynomial) {
+	    double[] currCoef = this.coefficients;
+	    int[] currExpo = this.exponents;
 
-    double[] poly2Coefficients = polynomial.coefficients;
-    int[] poly2Exponents = polynomial.exponents;
+	    double[] inputCoef = polynomial.coefficients;
+	    int[] inputExpo = polynomial.exponents;
 
-    int poly1Length = poly1Coefficients.length;
-    int poly2Length = poly2Coefficients.length;
-    int resultLength = poly1Length * poly2Length;
+	    int currPolyLen = currCoef.length;
+	    int inputPolyLen = inputCoef.length;
+	    int resultLength = currPolyLen * inputPolyLen;
 
-    double[] resultCoefficients = new double[resultLength];
-    int[] resultExponents = new int[resultLength];
+	    double[] resultCoefficients = new double[resultLength];
+	    int[] resultExponents = new int[resultLength];
 
-    int index = 0;
-    for (int i = 0; i < poly1Length; i++) {
-        for (int j = 0; j < poly2Length; j++) {
-            double product = poly1Coefficients[i] * poly2Coefficients[j];
-            int sumExponent = poly1Exponents[i] + poly2Exponents[j];
+	    int index = 0;
+	    for (int i = 0; i < currPolyLen; i++) {
+		for (int j = 0; j < inputPolyLen; j++) {
+		    double product = currCoef[i] * inputCoef[j];
+		    int sumExponent = currExpo[i] + inputExpo[j];
 
-            boolean foundExponent = false;
-            for (int k = 0; k < index; k++) {
-                if (resultExponents[k] == sumExponent) {
-                    resultCoefficients[k] += product;
-                    foundExponent = true;
-                    break;
-                }
-            }
+		    boolean foundExponent = false;
+		    for (int k = 0; k < index; k++) {
+			if (resultExponents[k] == sumExponent) {
+			    resultCoefficients[k] += product;
+			    foundExponent = true;
+			    break;
+			}
+		    }
 
-            if (!foundExponent) {
-                resultCoefficients[index] = product;
-                resultExponents[index] = sumExponent;
-                index++;
-            }
-        }
-    }
+		    if (!foundExponent) {
+			resultCoefficients[index] = product;
+			resultExponents[index] = sumExponent;
+			index++;
+		    }
+		}
+	    }
 
-    return new Polynomial(resultCoefficients, resultExponents);
-}
+	    return new Polynomial(resultCoefficients, resultExponents);
+	}
 
 	// Evaluate Method
 	public double evaluate(double x){
