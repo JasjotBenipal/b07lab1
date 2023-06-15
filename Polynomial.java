@@ -74,120 +74,103 @@ public class Polynomial{
 		myWriter.close();
 	}
 
+	//Add method
+	public Polynomial add(Polynomial polyArg) {
+		double[] currCoef = this.coefficients;
+		int[] currExpo = this.exponents;
 
-	/* // Add method
-	public Polynomial add(Polynomial polyArg){
-		int polyLength = polyArg.coefficients.length;
-		if (this.coefficients.length > polyLength) {
-			polyLength = this.coefficients.length;
+		double[] inputCoef = polyArg.coefficients;
+		int[] inputExpo = polyArg.exponents;
+
+		int resultLength = currCoef.length + inputCoef.length;
+
+		double[] resultCoefficients = new double[resultLength];
+		int[] resultExponents = new int[resultLength];
+
+		// Add coefficients for current polynomial
+		for (int i = 0; i < currCoef.length; i++) {
+			resultCoefficients[currExpo[i]] += currCoef[i];
+			resultExponents[currExpo[i]] = currExpo[i];
 		}
-		double[] newPoly = new double[polyLength];
-		for (int i = 0; i < this.coefficients.length; i++) {
-			newPoly[i] = this.coefficients[i];
+
+		// Add coefficients for input polynomial
+		for (int i = 0; i < inputCoef.length; i++) {
+			resultCoefficients[inputExpo[i]] += inputCoef[i];
+			resultExponents[inputExpo[i]] = inputExpo[i];
 		}
-		for (int i = 0; i < polyArg.coefficients.length; i++) {
-			newPoly[i] += polyArg.coefficients[i];
-		}
-		return new Polynomial(newPoly);
-	}
-	*/
-	// Add method
-	public Polynomial add(Polynomial polynomial) {
-    	double[] currCoef = this.coefficients;
-    	int[] currExpo = this.exponents;
 
-    	double[] inputCoef = polynomial.coefficients;
-    	int[] inputExpo = polynomial.exponents;
-
-    	int currPolyLen = currCoef.length;
-    	int inputPolyLen = inputCoef.length;
-    	int addLen = Math.max(currPolyLen, inputPolyLen);
-
-   	double[] resultCoefficients = new double[addLen];
-    	int[] resultExponents = new int[addLen];
-
-    	int i = 0, j = 0, k = 0;
-    	while (i < currPolyLen && j < inputPolyLen) {
-        	if (currExpo[i] < inputExpo[j]) {
-            	resultCoefficients[k] = currCoef[i];
-            	resultExponents[k] = currExpo[i];
-            	i++;
-        	} else if (currExpo[i] > inputExpo[j]) {
-            	resultCoefficients[k] = inputCoef[j];
-            	resultExponents[k] = inputExpo[j];
-            	j++;
-			} else {
-				double sum = currCoef[i] + inputCoef[j];
-				if (sum != 0) {
-					resultCoefficients[k] = sum;
-					resultExponents[k] = currExpo[i];
-				} else {
-					// Skip the term if the sum is zero
-					k--;
-				}
-				i++;
-				j++;
+		// Determine the number of non-zero terms in the result
+		int count = 0;
+		for (int i = 0; i < resultLength; i++) {
+			if (resultCoefficients[i] != 0) {
+				count++;
 			}
-			k++;
 		}
 
-		while (i < currPolyLen) {
-			resultCoefficients[k] = currCoef[i];
-			resultExponents[k] = currExpo[i];
-			i++;
-			k++;
+		// Create arrays for non-zero coefficients and exponents
+		double[] nonZeroCoefficients = new double[count];
+		int[] nonZeroExponents = new int[count];
+
+		// Populate the non-zero coefficient and exponent arrays
+		int index = 0;
+		for (int i = 0; i < resultLength; i++) {
+			if (resultCoefficients[i] != 0) {
+				nonZeroCoefficients[index] = resultCoefficients[i];
+				nonZeroExponents[index] = resultExponents[i];
+				index++;
+			}
 		}
 
-		while (j < inputPolyLen) {
-			resultCoefficients[k] = inputCoef[j];
-			resultExponents[k] = inputExpo[j];
-			j++;
-			k++;
-		}
-
-		return new Polynomial(resultCoefficients, resultExponents);
+		return new Polynomial(nonZeroCoefficients, nonZeroExponents);
 	}
+
 
 	// Multiplication
-	public Polynomial multiply(Polynomial polynomial) {
-	    double[] currCoef = this.coefficients;
-	    int[] currExpo = this.exponents;
+	public Polynomial multiply(Polynomial polyArg) {
+		double[] currCoef = this.coefficients;
+		int[] currExpo = this.exponents;
 
-	    double[] inputCoef = polynomial.coefficients;
-	    int[] inputExpo = polynomial.exponents;
+		double[] inputCoef = polyArg.coefficients;
+		int[] inputExpo = polyArg.exponents;
 
-	    int currPolyLen = currCoef.length;
-	    int inputPolyLen = inputCoef.length;
-	    int resultLength = currPolyLen * inputPolyLen;
+		int maxExponent = currCoef.length * inputCoef.length;
 
-	    double[] resultCoefficients = new double[resultLength];
-	    int[] resultExponents = new int[resultLength];
+		double[] resultCoefficients = new double[maxExponent + 1];
+		int[] resultExponents = new int[maxExponent + 1];
 
-	    int index = 0;
-	    for (int i = 0; i < currPolyLen; i++) {
-		for (int j = 0; j < inputPolyLen; j++) {
-		    double product = currCoef[i] * inputCoef[j];
-		    int sumExponent = currExpo[i] + inputExpo[j];
-
-		    boolean foundExponent = false;
-		    for (int k = 0; k < index; k++) {
-			if (resultExponents[k] == sumExponent) {
-			    resultCoefficients[k] += product;
-			    foundExponent = true;
-			    break;
+		for (int i = 0; i < currCoef.length; i++) {
+			for (int j = 0; j < inputCoef.length; j++) {
+				int expoSum = currExpo[i] + inputExpo[j];
+				resultCoefficients[expoSum] += currCoef[i] * inputCoef[j];
+				resultExponents[expoSum] = expoSum;
 			}
-		    }
-
-		    if (!foundExponent) {
-			resultCoefficients[index] = product;
-			resultExponents[index] = sumExponent;
-			index++;
-		    }
 		}
-	    }
 
-	    return new Polynomial(resultCoefficients, resultExponents);
+		// Determine the number of non-zero terms in the result
+		int count = 0;
+		for (int i = 0; i <= maxExponent; i++) {
+			if (resultCoefficients[i] != 0) {
+				count++;
+			}
+		}
+
+		// Create arrays for non-zero coefficients and exponents
+		double[] nonZeroCoefficients = new double[count];
+		int[] nonZeroExponents = new int[count];
+
+		// Populate the non-zero coefficient and exponent arrays
+		int index = 0;
+		for (int i = 0; i <= maxExponent; i++) {
+			if (resultCoefficients[i] != 0) {
+				nonZeroCoefficients[index] = resultCoefficients[i];
+				nonZeroExponents[index] = resultExponents[i];
+				index++;
+			}
+		}
+
+		return new Polynomial(nonZeroCoefficients, nonZeroExponents);
 	}
+
 
 	// Evaluate Method
 	public double evaluate(double x){
